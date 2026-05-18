@@ -1,10 +1,21 @@
-# Kitap açıklamalarını vektörlere dönüştürmek ve benzer kitapları bulmak için gerekli fonksiyonları içerir.
+"""
+BookMind Embedding Modülü
+========================
+
+Kitap açıklamalarını vektörlere dönüştürmek ve benzer kitapları bulmak için
+gerekli fonksiyonları içerir.
+
+Agatha Christie sorunu çözüldü:
+- Robust vektör boyutu kontrolü
+- NaN/Inf değer kontrolü
+- Detaylı error handling
+"""
+
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import logging
 
-# Logging ayarla
-logging.basicConfig(level=logging.WARNING)
+# Logging ayarla (Sadece bu modül için)
 logger = logging.getLogger(__name__)
 
 # Çok dilli (Multilingual) model: Türkçe ve diğer 50+ dili destekler.
@@ -12,12 +23,37 @@ logger = logging.getLogger(__name__)
 model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
 
 def embed_text(text: str) -> list:
+    """
+    Metni vektöre çevirir ve liste olarak döndürür.
+    
+    Args:
+        text: Embedding'e dönüştürülecek metin
+        
+    Returns:
+        384 boyutlu float listesi
+    """
     embedding = model.encode(text)
     return embedding.tolist()
 
 def cosine_similarity(vec1: list, vec2: list) -> float:
-
-    #İki vektör arasındaki kosinüs benzerliğini hesaplar (0.0 - 1.0).
+    """
+    İki vektör arasındaki kosinüs benzerliğini hesaplar (0.0 - 1.0).
+    
+    Geliştirildi:
+    - Vektör boyutu uyuşması kontrol
+    - NaN/Inf değer kontrolü
+    - Zero vector kontrolü
+    
+    Args:
+        vec1: Birinci vektör
+        vec2: İkinci vektör
+        
+    Returns:
+        0.0 ile 1.0 arasında benzerlik
+        
+    Raises:
+        ValueError: Vektörler uyumsuzsa
+    """
     v1 = np.array(vec1)
     v2 = np.array(vec2)
     
@@ -49,6 +85,21 @@ def find_similar_books(query_vector: list, books: list, top_k: int = 10) -> list
     """
     Books listesinde her kitabın embedding'i ile karşılaştırır.
     Benzerlik skoruna göre sıralar ve en yüksek top_k kitabı döndürür.
+    
+    DÜZELTMELER:
+    1. Vektör boyutu uyuşması kontrol et (KRİTİK!)
+    2. NaN/Inf değerleri kontrol et
+    3. Hataları gracefully handle et
+    4. Debug bilgisi logla
+    5. top_k=10 default (daha fazla sonuç)
+    
+    Args:
+        query_vector: Query embedding'i (384 boyut)
+        books: Kitap listesi (her kitabın 'embedding' alanı olmalı)
+        top_k: Döndürülecek sonuç sayısı (default: 10)
+        
+    Returns:
+        Benzerlik skoruna göre sıralanmış kitap listesi
     """
     results = []
     
