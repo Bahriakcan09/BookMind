@@ -1,0 +1,25 @@
+# BookMind AI - Bağımlılıklar (Requirements)
+# ------------------------------------------
+
+# Web & API
+fastapi==0.119.1
+uvicorn==0.38.0
+
+# Yapay Zeka & LLM (Gemini)
+langchain-core==1.4.0
+langchain-community==0.4.1
+langchain-google-genai==4.2.2
+google-generativeai==0.8.5
+
+# Vektörleme & Embedding
+sentence-transformers==5.1.1
+numpy==2.2.6
+
+# Veritabanı (Firebase)
+firebase-admin==7.4.0
+google-cloud-firestore==2.27.0
+
+# Araçlar & Yardımcılar
+python-dotenv==1.1.1
+requests==2.32.5
+requests-toolbelt==1.0.0
