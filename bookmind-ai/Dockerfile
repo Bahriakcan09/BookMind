@@ -1,23 +1,29 @@
-# Hafif Python imajı kullanıyoruz
+# Hafif Python imajı
 FROM python:3.10-slim
 
-# Çalışma dizinini oluştur
+# Çalışma dizini
 WORKDIR /app
 
-# Sistem bağımlılıklarını kur (Bazı kütüphaneler için gerekebilir)
+# Sistem bağımlılıkları (Kullanıcı izinleri için gerekli araçlar dahil)
 RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Bağımlılık dosyasını kopyala ve kur
-COPY requirements.txt .
+# Hugging Face için 'user' (UID 1000) oluşturma
+RUN useradd -m -u 1000 user
+
+# Bağımlılıkları kopyala ve kur
+COPY --chown=user:user requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Tüm proje dosyalarını kopyala
-COPY . .
+# Proje dosyalarını kopyala ve sahipliğini 'user'a ver
+COPY --chown=user:user . .
 
-# Render.com'un dinamik portuna uyum sağlamak için ortam değişkeni
-ENV PORT=8000
+# Hugging Face varsayılan portu
+ENV PORT=7860
 
-# Sunucuyu başlat (Prod main üzerinden)
+# Kullanıcıyı değiştir (Güvenlik ve HF standardı)
+USER user
+
+# Sunucuyu başlat
 CMD ["sh", "-c", "uvicorn app.prod_main:app --host 0.0.0.0 --port $PORT"]
