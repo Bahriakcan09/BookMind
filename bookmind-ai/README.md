@@ -81,4 +81,11 @@ bookmind-ai/
 4.  **API:** `python app/main.py` ile sunucuyu başlatın.
 
 ---
-*BookMind AI, veriyi soğuk bir yığından canlı bir rehbere dönüştüren modern bir mühendislik çalışmasıdır.*
+
+## 🌐 Canlı Demo
+BookMind AI projesi yayındadır! Canlı çalışan sistemi incelemek ve kod yapısını görmek için aşağıdaki bağlantıyı ziyaret edebilirsiniz:
+
+👉 **[Canlı Demo ve Kaynak Kodları (Hugging Face Spaces)](https://huggingface.co/spaces/DemetAsgaroglu/bookmind-ai/tree/main)**
+
+---
+*BookMind AI, 2026 Hackathon için geliştirilmiştir.*
