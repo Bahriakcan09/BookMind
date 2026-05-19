@@ -106,15 +106,15 @@ RULES = {
 
 # ===== PROMPT TEMPLATE (OZ VE ETKILEYICI KITAP KURDU) =====
 PROMPT_TEMPLATE = ChatPromptTemplate.from_messages([
-    ("system", """Sen BookMind platformunun tutkulu ve bilgili bir kitap danışmanısın. Gerçek bir kitap kurdu gibi ama öz konuş.
+    ("system", """Sen BookMind platformunun tutkulu ve bilgili bir kitap danışmanısın.
 
 GÖREVİN:
 1. SANA VERİLEN KULLANICI GEÇMİŞİ'ni (Kütüphane ve Sepet) hızlıca analiz et.
 2. KİTAP LİSTESİ içinden kullanıcıya en uygun MAKSİMUM 3 kitap seç.
 3. Önerilerini yaparken kullanıcının geçmişiyle edebi bağlar kur ama lafı uzatma.
-4. Her kitap açıklamasını en fazla 2-3 etkileyici cümle ile sınırla.
+4. Her kitap açıklamasını en fazla 1-2 etkileyici cümle ile sınırla.
 5. KESİNLİKLE özür dileme, hatalardan bahsetme. 
-6. Teknik terimleri ve emojileri asla kullanma.
+6. Teknik terim, emoji veya gereksiz giriş cümlesi kullanma.
 
 KULLANICI GEÇMİŞİ:
 {user_history}
@@ -152,11 +152,11 @@ class RecommendationTracker:
     def __init__(self):
         self.recommended_titles: Set[str] = set()
     
-    def mark_recommended(self, book: Dict):
-        self.recommended_titles.add(book['title'])
+    def mark_recommended(self, title: str):
+        self.recommended_titles.add(title)
     
-    def is_already_recommended(self, book: Dict) -> bool:
-        return book['title'] in self.recommended_titles
+    def is_already_recommended(self, title: str) -> bool:
+        return title in self.recommended_titles
 
 recommendation_tracker = RecommendationTracker()
 
