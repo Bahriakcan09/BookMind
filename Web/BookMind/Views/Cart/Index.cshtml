@@ -1,0 +1,46 @@
+@{
+    ViewData["Title"] = "Sepetim";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <h2 class="fw-bold mb-4">Sepetim</h2>
+        <div id="cart-items">
+            <!-- Items loaded via JS -->
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 20px;">
+            <h4 class="fw-bold mb-4">Sipariş Özeti</h4>
+            <div class="d-flex justify-content-between mb-2">
+                <span>Ara Toplam</span>
+                <span id="cart-total">0.00 ₺</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span>Kargo</span>
+                <span class="text-success">Ücretsiz</span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between mb-4">
+                <span class="fw-bold">Toplam</span>
+                <span class="fw-bold text-primary fs-4" id="cart-total-final">0.00 ₺</span>
+            </div>
+            <a asp-action="Checkout" class="btn btn-primary w-100 py-3 fw-bold">Ödemeye Geç</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/cart.js"></script>
+    <script>
+        // Update final total on cart page
+        const originalRenderCart = renderCart;
+        renderCart = () => {
+            originalRenderCart();
+            const total = document.getElementById('cart-total').textContent;
+            const finalTotal = document.getElementById('cart-total-final');
+            if (finalTotal) finalTotal.textContent = total;
+        };
+        renderCart();
+    </script>
+}

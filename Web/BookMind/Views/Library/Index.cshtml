@@ -1,0 +1,81 @@
+@{
+    ViewData["Title"] = "Kütüphanem";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Yeni Kitap Ekle</h5>
+                <p class="text-muted small">Barkod taratarak veya ISBN girerek kütüphanenize kitap ekleyin.</p>
+                
+                <div id="reader" style="width: 100%;" class="rounded overflow-hidden mb-3"></div>
+                
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" id="btn-scan">
+                        <i class="bi bi-camera me-2"></i>Barkod Tara
+                    </button>
+                    <button class="btn btn-outline-secondary" id="btn-upload">
+                        <i class="bi bi-image me-2"></i>Görsel Yükle
+                    </button>
+                    <input type="file" id="barcode-file" accept="image/*" class="d-none">
+                    
+                    <div class="input-group mt-2">
+                        <input type="text" id="isbn-input" class="form-control" placeholder="ISBN veya Kitap Adı">
+                        <button class="btn btn-outline-primary" id="btn-isbn-add">Ara ve Ekle</button>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <button class="btn btn-link btn-sm text-decoration-none p-0" id="btn-manual-form">
+                        <i class="bi bi-pencil-square me-1"></i>Bilgileri elle girerek ekle
+                    </button>
+                </div>
+                
+                <div id="scan-result" class="mt-3 d-none">
+                    <div class="alert alert-success py-2 small">
+                        <strong>Bulundu:</strong> <span id="detected-isbn"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Dijital Kütüphanem</h2>
+            <span class="badge bg-primary rounded-pill" id="library-count">0 Kitap</span>
+        </div>
+        
+        <div id="library-container" class="row">
+            <!-- Books will be loaded here -->
+            <div class="text-center p-5">
+                <div class="spinner-border text-primary" role="status"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Book Modal -->
+<div class="modal fade" id="addBookModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Kitap Onayı</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center" id="modal-book-content">
+                <!-- Book info will be here -->
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="btn-confirm-add">Kütüphaneye Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="~/js/library.js" asp-append-version="true"></script>
+}

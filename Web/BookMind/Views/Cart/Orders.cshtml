@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Siparişlerim";
+}
+
+<div class="row">
+    <div class="col-12">
+        <h2 class="fw-bold mb-4">Geçmiş Siparişlerim</h2>
+        
+        <div id="orders-container">
+            <div class="text-center p-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/orders.js" asp-append-version="true"></script>
+}

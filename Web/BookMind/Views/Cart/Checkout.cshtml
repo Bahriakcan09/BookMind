@@ -1,0 +1,85 @@
+@{
+    ViewData["Title"] = "Ödeme Simülasyonu";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-4">
+            <h2 class="fw-bold mb-4 text-center">Ödeme Bilgileri</h2>
+            
+            <div id="payment-form-container">
+                <div class="mb-4 text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" height="30" class="me-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" height="30">
+                </div>
+
+                <form id="payment-form">
+                    <div class="mb-3">
+                        <label class="form-label">Kart Üzerindeki İsim</label>
+                        <input type="text" class="form-control" required placeholder="AD SOYAD">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kart Numarası</label>
+                        <input type="text" class="form-control" required placeholder="0000 0000 0000 0000" maxlength="19">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Son Kullanma</label>
+                            <input type="text" class="form-control" required placeholder="AA/YY" maxlength="5">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">CVV</label>
+                            <input type="text" class="form-control" required placeholder="000" maxlength="3">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-3 mt-3 fw-bold" id="btn-pay">Ödemeyi Tamamla</button>
+                </form>
+            </div>
+
+            <div id="payment-success" class="text-center d-none p-5">
+                <div class="mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="#4BB543" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg>
+                </div>
+                <h3 class="fw-bold">Ödeme Başarılı!</h3>
+                <p class="text-muted">Siparişiniz alındı. Keyifli okumalar dileriz.</p>
+                <a href="/" class="btn btn-primary mt-3">Ana Sayfaya Dön</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/cart.js" asp-append-version="true"></script>
+    <script>
+        document.getElementById('payment-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-pay');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>İşleniyor...';
+
+            // Simulate processing delay
+            setTimeout(async () => {
+                try {
+                    const result = await window.completeOrder();
+                    
+                    if (result.success) {
+                        document.getElementById('payment-form-container').classList.add('d-none');
+                        document.getElementById('payment-success').classList.remove('d-none');
+                        console.log("Sipariş Tamamlandı:", result.orderId);
+                    } else {
+                        alert(result.message);
+                        btn.disabled = false;
+                        btn.innerHTML = 'Ödemeyi Tamamla';
+                    }
+                } catch (err) {
+                    console.error("Ödeme hatası:", err);
+                    alert("Bir hata oluştu, lütfen tekrar deneyin.");
+                    btn.disabled = false;
+                    btn.innerHTML = 'Ödemeyi Tamamla';
+                }
+            }, 2000);
+        });
+    </script>
+}

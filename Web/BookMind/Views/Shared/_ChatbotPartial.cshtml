@@ -1,0 +1,25 @@
+<div id="chatbot-toggle">
+    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-chat-dots-fill" viewBox="0 0 16 16">
+        <path d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7M5 8a1 1 0 1 0-2 0 1 1 0 0 0 2 0m4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
+    </svg>
+</div>
+
+<div id="chatbot-container">
+    <div class="chatbot-header">
+        <span class="fw-bold">BookMind AI</span>
+        <button type="button" class="btn-close btn-close-white" id="chatbot-close" aria-label="Close"></button>
+    </div>
+    <div class="chatbot-messages d-flex flex-column" id="chat-box">
+        <div class="message bot">Merhaba! Ben BookMind AI. Size nasıl yardımcı olabilirim?</div>
+    </div>
+    <div class="p-3 border-top">
+        <div class="input-group">
+            <input type="text" id="chat-input" class="form-control border-0" placeholder="Bir şeyler yazın..." style="box-shadow: none;">
+            <button class="btn btn-primary" type="button" id="chat-send">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
+                    <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
