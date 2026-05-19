@@ -1,0 +1,42 @@
+@model HackatonProject.Models.Cart
+@{
+    ViewData["Title"] = "Ödeme";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="fw-bold mb-4">Teslimat ve Ödeme</h2>
+            
+            <form asp-action="PlaceOrder" method="post">
+                <div class="card shadow-sm border-0 p-4 mb-4">
+                    <h5 class="fw-bold mb-3">Teslimat Adresi</h5>
+                    <div class="mb-3">
+                        <textarea name="address" class="form-control" rows="3" placeholder="Açık adresinizi buraya yazın..." required></textarea>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 p-4 mb-4">
+                    <h5 class="fw-bold mb-3">Ödeme Yöntemi</h5>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="payment" id="kapida" checked>
+                        <label class="form-check-label" for="kapida">
+                            Kapıda Ödeme (Nakit/Kart)
+                        </label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="payment" id="online" disabled>
+                        <label class="form-check-label text-muted" for="online">
+                            Kredi Kartı ile Online Ödeme (Yakında)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    <h4 class="mb-4 text-primary fw-bold">Toplam Tutar: @Model.TotalPrice.ToString("C2")</h4>
+                    <button type="submit" class="btn btn-success btn-lg px-5 fw-bold">Siparişi Tamamla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

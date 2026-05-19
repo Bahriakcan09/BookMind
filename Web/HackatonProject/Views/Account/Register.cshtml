@@ -1,0 +1,28 @@
+@{
+    ViewData["Title"] = "Kaydol";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 p-4">
+                <h3 class="fw-bold mb-4 text-center">Hesap Oluştur</h3>
+                <form asp-action="Register" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">E-posta</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Şifre</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 py-2 fw-bold">Kaydol</button>
+                </form>
+                <div class="mt-3 text-center">
+                    <span class="small text-muted">Zaten üye misiniz?</span>
+                    <a asp-action="Login" class="small fw-bold text-decoration-none">Giriş Yapın</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
