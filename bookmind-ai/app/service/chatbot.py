@@ -1,9 +1,21 @@
 import os
-import json
+import logging
 import sys
+
+# ===== [KRITIK] LOGGING ILK SIRADA OLMALI =====
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()
+    ],
+    force=True 
+)
+logger = logging.getLogger(__name__)
+
+import json
 import re
 import time
-import logging
 import difflib
 from datetime import datetime
 from dotenv import load_dotenv
@@ -32,22 +44,12 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 try:
     from lib.embeddings import embed_text, find_similar_books
     from lib.firebase_db import fb_manager
+    logger.info("Moduller ve Firebase baglantisi hazirlaniyor... [OK]")
 except ImportError as e:
-    print(f"Modul yuklenemedi: {e}")
+    logger.error(f"Modul yuklenemedi: {e}")
     sys.exit(1)
 
-# ===== LOGGING KURULUMU =====
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
-
-# ===== AYARLAR VE CANLI VERI =====
-USER_ID = "22coPPxc9pNy3XevLbPhhSpsGjr1"
+# ===== AYARLAR VE GIZLI VERI =====
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 if not GOOGLE_API_KEY:
@@ -69,6 +71,7 @@ except Exception as e:
     sys.exit(1)
 
 # ===== BELLEK (MEMORY) KURULUMU =====
+# Her kullanıcı için ayrı hafıza tutacak şekilde geliştirilebilir
 chat_history = ChatMessageHistory()
 
 # ===== KİTAP VERİLERİ YÜKLEME =====
@@ -81,7 +84,7 @@ except Exception as e:
     logger.error(f"Veri yukleme hatasi: {e}")
     sys.exit(1)
 
-# ===== KURAL BAZLI FİLTRELER (TAM VERSİYON) =====
+# ===== KURAL BAZLI FİLTRELER =====
 RULES = {
     "SELAMLAMA": {
         "tetikleyiciler": ["merhaba", "selam", "hi", "hey", "gunaydin", "iyi gunler", "selamlar"],
@@ -108,7 +111,7 @@ PROMPT_TEMPLATE = ChatPromptTemplate.from_messages([
 GÖREVİN:
 1. SANA VERİLEN KULLANICI GEÇMİŞİ'ni (Kütüphane ve Sepet) hızlıca analiz et.
 2. KİTAP LİSTESİ içinden kullanıcıya en uygun MAKSİMUM 3 kitap seç.
-3. Önerilerini yaparken "Kütüphanenizdeki Fahrenheit 451'in o sarsıcı dünyasını sevdiyseniz..." gibi edebi bağlar kur ama lafı uzatma.
+3. Önerilerini yaparken kullanıcının geçmişiyle edebi bağlar kur ama lafı uzatma.
 4. Her kitap açıklamasını en fazla 2-3 etkileyici cümle ile sınırla.
 5. KESİNLİKLE özür dileme, hatalardan bahsetme. 
 6. Teknik terimleri ve emojileri asla kullanma.
@@ -122,7 +125,7 @@ KİTAP LİSTESİ:
     ("human", "{question}")
 ])
 
-# ===== RATE LIMITING YAPISI =====
+# ===== ENDUSTRIYEL YAPILAR =====
 class RateLimiter:
     def __init__(self, requests_per_minute: int = 15, requests_per_day: int = 1500):
         self.requests_per_minute = requests_per_minute
@@ -145,7 +148,6 @@ class RateLimiter:
 
 rate_limiter = RateLimiter()
 
-# ===== REKOMENDASİON TARİHÇESİ =====
 class RecommendationTracker:
     def __init__(self):
         self.recommended_titles: Set[str] = set()
@@ -193,15 +195,16 @@ def invoke_llm_with_retry(messages, max_retries: int = 3) -> str:
             time.sleep(10 * (attempt + 1))
     return "Üzgünüm, şu an yanıt üretemiyorum."
 
-def get_rag_response(question: str) -> str:
+def get_rag_response(question: str, user_id: str) -> str:
     # 1. Kural Kontrolü
     rule_response = apply_rule_based_filter(question)
     if rule_response: return rule_response
     
-    # 2. Canli Kullanici Verilerini Cek
-    user_context = fb_manager.get_user_context(USER_ID)
+    # 2. Canli Kullanici Verilerini Cek (Gelen ID'ye gore)
+    user_context = fb_manager.get_user_context(user_id)
+    logger.info(f"Canli kullanıcı verisi yuklendi ({user_id})")
     
-    # 3. Hafızalı Akıllı Arama
+    # 3. Akıllı Arama
     search_query = extract_search_intent(question)
     if len(search_query) < 3 and len(chat_history.messages) >= 2:
         last_user_msg = chat_history.messages[-2].content
@@ -230,7 +233,7 @@ def get_rag_response(question: str) -> str:
     # 5. Context Oluşturma
     context_text = ""
     for b in similar_books:
-        if not recommendation_tracker.is_already_recommended(b):
+        if not recommendation_tracker.is_already_recommended(b['title']):
             context_text += f"Başlık: {b['title']}, Yazar: {b['author']}, Tür: {b.get('genre', '')}, Özet: {b['description'][:200]}\n\n"
     
     try:
@@ -246,15 +249,17 @@ def get_rag_response(question: str) -> str:
         chat_history.add_ai_message(response_content)
         
         for book in similar_books[:2]:
-            recommendation_tracker.mark_recommended(book)
+            recommendation_tracker.mark_recommended(book['title'])
             
         return response_content
     except Exception as e:
         return f"Sistem hatası: {str(e)}"
 
 def start_chat():
+    # Terminal testleri için varsayılan bir ID kullanalım
+    TEST_USER_ID = "22coPPxc9pNy3XevLbPhhSpsGjr1"
     print("\n" + "="*60)
-    print("BookMind Akıllı Asistanı Yayında! (Tüm Kurallar Aktif)")
+    print("BookMind Akıllı Asistanı Yayında! (Dinamik Entegrasyon Modu)")
     print("="*60 + "\n")
     
     while True:
@@ -262,7 +267,7 @@ def start_chat():
         if not user_input or user_input.lower() == 'q':
             print("\nAsistan: Hoşça kalın!")
             break
-        print(f"\n🤖 Asistan:\n{get_rag_response(user_input)}")
+        print(f"\n🤖 Asistan:\n{get_rag_response(user_input, TEST_USER_ID)}")
 
 if __name__ == "__main__":
     start_chat()
