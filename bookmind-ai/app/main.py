@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import sys
 import os
+from datetime import datetime
 
 # Proje kok dizinini Python yoluna ekle
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -10,38 +11,34 @@ project_root = os.path.abspath(os.path.join(current_dir, ".."))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-# Kendi servislerimizi import edelim
-# Not: Mevcut chatbot mantığını bir fonksiyona bağlayacağız
+# Kendi servisimizi import edelim
 from app.service.chatbot import get_rag_response
 
-app = FastAPI(title="BookMind AI API", version="1.0.0")
+app = FastAPI(title="BookMind AI API", version="1.1.0")
 
-
+# CORS Ayarları: Web sitesinden erişim için şart!
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Geliştirme aşamasında her yerden erişime izin ver
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# İstek (Request) Modeli bu değiştirilecek daha sonra, şu an için sadece mesaj ve kullanıcı ID'si alacağız 
+# Geliştirilmiş İstek Modeli (user_id zorunlu hale geldi)
 class ChatRequest(BaseModel):
     message: str
-    user_id: str = "22coPPxc9pNy3XevLbPhhSpsGjr1" # Varsayılan olarak senin ID'n
+    user_id: str
 
 @app.get("/")
 def home():
-    return {"status": "online", "message": "BookMind AI Sunucusu Calisiyor"}
+    return {"status": "online", "message": "BookMind AI API Sunucusu Hazir"}
 
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
-    """
-    Kullanıcı mesajını alır, chatbot mantığını çalıştırır ve cevabı döner.
-    """
     try:
-        # Chatbot çekirdeğini çalıştır
-        response = get_rag_response(request.message)
+        # Mesajı ve gelen USER_ID'yi zeka servisine iletiyoruz
+        response = get_rag_response(request.message, request.user_id)
         
         return {
             "success": True,
@@ -53,5 +50,4 @@ async def chat(request: ChatRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    from datetime import datetime
     uvicorn.run(app, host="0.0.0.0", port=8000)
